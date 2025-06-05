@@ -40,15 +40,29 @@
 
 ## 📦 インストールと起動
 
-### 前提条件
-- Node.js 14以上
-- npm または yarn
+### 🎯 配布版を使用する場合（推奨）
 
-### セットアップ
+**事前準備**: Node.js または Python 3.x をインストール
+- [Node.js（推奨）](https://nodejs.org/)
+- [Python](https://www.python.org/)
+
+**ダウンロードと起動**:
+1. [Releases](https://github.com/jst-wave/md_editor/releases) から `MarkdownEditor-配布版-v2-final.zip` をダウンロード
+2. ZIPファイルを展開
+3. 以下のいずれかの方法で起動：
+
+**方法A（最も簡単）**: `MarkdownEditor.bat` をダブルクリック
+**方法B**: `launcher.html` をブラウザで開く
+**方法C**: `index.html` を直接ブラウザで開く
+
+### 🔧 開発環境での起動
+
+前提条件: Node.js 14以上、npm または yarn
+
 ```bash
 # リポジトリをクローン
-git clone https://github.com/jst-wave/markdown-memo-app.git
-cd markdown-memo-app
+git clone https://github.com/jst-wave/md_editor.git
+cd memo-app
 
 # 依存関係をインストール
 npm install
@@ -117,6 +131,41 @@ npm start
 3. 変更をコミット (`git commit -m 'Add amazing feature'`)
 4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
 5. プルリクエストを作成
+
+## 📱 配布版の詳細
+
+### ファイル構成
+- `index.html` - メインアプリケーション
+- `bundle.js` - JavaScript バンドル（135KB）
+- `MarkdownEditor.bat` - Windows用起動スクリプト
+- `launcher.html` - ブラウザベースランチャー
+- `README.txt` - 使用方法
+
+### 対応環境
+- **OS**: Windows 10/11、macOS、Linux
+- **ブラウザ**: Chrome、Firefox、Edge、Safari（最新版）
+- **ランタイム**: Node.js 14+ または Python 3.6+
+
+### トラブルシューティング
+- **バッチファイルが実行できない**: `launcher.html` を使用
+- **文字化けが発生**: UTF-8対応済みのバッチファイルを使用
+- **ポートエラー**: 他のアプリケーションとのポート競合を確認
+- **接続エラー**: サーバー起動まで数秒待機
+
+## 📄 ライセンス
+
+MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
+
+## 📞 サポート
+
+- 🐛 バグ報告: [Issues](https://github.com/jst-wave/md_editor/issues)
+- 💡 機能要望: [Issues](https://github.com/jst-wave/md_editor/issues)
+- 📧 開発者: jst-wave
+
+---
+
+**最終更新**: 2025年6月5日  
+**バージョン**: v2.0（配布版改善リリース）
 
 ## 📄 ライセンス
 
