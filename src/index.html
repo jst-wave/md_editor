@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メモ帳アプリ</title>
+    </head>
+<body>
+    <div id="app">
+        <header>
+            <h1>メモ帳アプリ</h1>
+            <div class="controls">
+                <button id="add-tab">+ 新しいタブ</button>
+                <button id="save-markdown">💾 ダウンロード</button>
+                <button id="toggle-preview">プレビュー表示</button>
+                <button id="search-toggle">検索・置換</button>
+            </div>
+        </header>
+        
+        <nav id="tab-container">
+            <ul id="tab-list">
+                <!-- タブがここに追加されます -->
+            </ul>
+        </nav>
+
+        <div id="search-replace-panel" class="hidden">
+            <div class="search-row">
+                <input type="text" id="search-input" placeholder="検索文字列">
+                <button id="search-prev">↑</button>
+                <button id="search-next">↓</button>
+                <span id="search-count"></span>
+            </div>
+            <div class="replace-row">
+                <input type="text" id="replace-input" placeholder="置換文字列">
+                <button id="replace-one">置換</button>
+                <button id="replace-all">すべて置換</button>
+                <button id="close-search">✕</button>
+            </div>
+        </div>
+
+        <main>
+            <div id="editor-container">
+                <div id="editor-pane">
+                    <textarea id="editor" placeholder="ここにマークダウンを入力してください..."></textarea>
+                </div>
+                <div id="resizer"></div>
+                <div id="preview-pane">
+                    <div id="preview"></div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="status-bar">
+                <span id="save-status">保存済み</span>
+                <span id="char-count">0文字</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
