@@ -4,8 +4,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Production builds
-dist/
+# Production builds (except dist folder for distribution)
 build/
 
 # Environment variables

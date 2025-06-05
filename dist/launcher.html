@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor Launcher</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .launcher-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .launcher-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .direct-link {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Markdown Editor</h1>
+        
+        <p>以下のボタンをクリックしてサーバーを起動してください：</p>
+          <div>
+            <button class="launcher-btn" onclick="launchWithNode()">
+                🟢 Node.js で起動
+            </button>
+            <button class="launcher-btn" onclick="launchWithPython()">
+                🐍 Python で起動
+            </button>
+        </div>
+
+        <div style="margin: 20px 0;">
+            <button class="launcher-btn" onclick="downloadBatFile()" style="background: rgba(255, 193, 7, 0.3);">
+                📁 バッチファイルをダウンロード
+            </button>
+            <p><small>※ ダウンロードしたバッチファイルをダブルクリックで起動</small></p>
+        </div>
+        
+        <div class="direct-link">
+            <h3>直接アクセス:</h3>
+            <a href="./index.html" class="launcher-btn" target="_blank">
+                📄 index.html を直接開く
+            </a>
+            <p><small>※ 一部機能に制限があります</small></p>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
+            <p>必要なソフトウェア:</p>
+            <p>
+                <a href="https://nodejs.org/" target="_blank" style="color: #90caf9;">Node.js をダウンロード</a> | 
+                <a href="https://www.python.org/" target="_blank" style="color: #90caf9;">Python をダウンロード</a>
+            </p>
+        </div>
+    </div>    <script>
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('コマンドがクリップボードにコピーされました！', 'success');
+            }).catch(() => {
+                showStatus('手動でコマンドをコピーしてください', 'error');
+            });
+        }
+
+        function launchWithNode() {
+            const nodeCommand = 'node -e "const http=require(\'http\'),fs=require(\'fs\');http.createServer((req,res)=>{try{const file=req.url===\'/\'?\'index.html\':req.url.slice(1);const content=fs.readFileSync(file);res.writeHead(200,{\'Content-Type\':file.endsWith(\'.js\')?\'application/javascript\':\'text/html\'});res.end(content)}catch{res.writeHead(404);res.end(\'404\')}}).listen(3001,()=>{console.log(\'Server: http://localhost:3001\');require(\'child_process\').exec(\'start http://localhost:3001\')})"';
+            
+            showStatus('以下の手順でサーバーを起動してください:', 'success');
+            
+            const instructions = document.createElement('div');
+            instructions.innerHTML = `
+                <div style="margin-top: 15px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                    <p><strong>手順:</strong></p>
+                    <p>1. Windowsキー + R を押してファイル名を指定して実行を開く</p>
+                    <p>2. "cmd" と入力してEnterを押す</p>
+                    <p>3. 以下のコマンドをコピーして貼り付け:</p>
+                    <div style="background: #333; color: #fff; padding: 10px; border-radius: 4px; font-family: monospace; margin: 10px 0; word-break: break-all;">
+                        cd /d "${window.location.pathname.replace('/launcher.html', '').replace(/^\/([A-Z]):/, '$1:')}" && ${nodeCommand}
+                    </div>
+                    <button onclick="copyNodeCommand()" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">📋 コマンドをコピー</button>
+                    <p>4. コマンドプロンプトでEnterを押す</p>
+                    <p>5. ブラウザが自動で開くまで待つ</p>
+                </div>
+            `;
+            
+            document.getElementById('status').appendChild(instructions);
+        }
+
+        function launchWithPython() {
+            const pythonCommand = 'python -m http.server 8000';
+            
+            showStatus('以下の手順でサーバーを起動してください:', 'success');
+            
+            const instructions = document.createElement('div');
+            instructions.innerHTML = `
+                <div style="margin-top: 15px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                    <p><strong>手順:</strong></p>
+                    <p>1. Windowsキー + R を押してファイル名を指定して実行を開く</p>
+                    <p>2. "cmd" と入力してEnterを押す</p>
+                    <p>3. 以下のコマンドをコピーして貼り付け:</p>
+                    <div style="background: #333; color: #fff; padding: 10px; border-radius: 4px; font-family: monospace; margin: 10px 0;">
+                        cd /d "${window.location.pathname.replace('/launcher.html', '').replace(/^\/([A-Z]):/, '$1:')}" && ${pythonCommand}
+                    </div>
+                    <button onclick="copyPythonCommand()" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">📋 コマンドをコピー</button>
+                    <p>4. コマンドプロンプトでEnterを押す</p>
+                    <p>5. ブラウザで <a href="http://localhost:8000" target="_blank" style="color: #90caf9;">http://localhost:8000</a> を開く</p>
+                </div>
+            `;
+            
+            document.getElementById('status').appendChild(instructions);
+        }
+
+        function copyNodeCommand() {
+            const command = `cd /d "${window.location.pathname.replace('/launcher.html', '').replace(/^\/([A-Z]):/, '$1:')}" && node -e "const http=require('http'),fs=require('fs');http.createServer((req,res)=>{try{const file=req.url==='/'?'index.html':req.url.slice(1);const content=fs.readFileSync(file);res.writeHead(200,{'Content-Type':file.endsWith('.js')?'application/javascript':'text/html'});res.end(content)}catch{res.writeHead(404);res.end('404')}}).listen(3001,()=>{console.log('Server: http://localhost:3001');require('child_process').exec('start http://localhost:3001')})"`;
+            copyToClipboard(command);
+        }        function copyPythonCommand() {
+            const command = `cd /d "${window.location.pathname.replace('/launcher.html', '').replace(/^\/([A-Z]):/, '$1:')}" && python -m http.server 8000`;
+            copyToClipboard(command);
+        }
+
+        function downloadBatFile() {
+            const batContent = `@echo off
+cd /d "%~dp0"
+cls
+echo ==========================================
+echo    Markdown Editor - 起動スクリプト
+echo ==========================================
+echo.
+
+REM Node.js チェック
+node --version >nul 2>&1
+if %errorlevel% == 0 (
+    echo [成功] Node.js が見つかりました
+    echo [情報] サーバーを http://localhost:3001 で起動します
+    echo [情報] ブラウザが自動で開きます
+    echo.
+    echo サーバーを停止するには Ctrl+C を押してください
+    echo.
+    start "" http://localhost:3001
+    node -e "const http=require('http'),fs=require('fs');http.createServer((req,res)=>{try{const file=req.url==='/'?'index.html':req.url.slice(1);const content=fs.readFileSync(file);res.writeHead(200,{'Content-Type':file.endsWith('.js')?'application/javascript':'text/html'});res.end(content)}catch{res.writeHead(404);res.end('404')}}).listen(3001,()=>console.log('サーバー起動: http://localhost:3001'))"
+    goto :end
+)
+
+REM Python チェック
+python --version >nul 2>&1
+if %errorlevel% == 0 (
+    echo [成功] Python が見つかりました
+    echo [情報] サーバーを http://localhost:8000 で起動します
+    echo [情報] ブラウザで http://localhost:8000 を開いてください
+    echo.
+    echo サーバーを停止するには Ctrl+C を押してください
+    echo.
+    start "" http://localhost:8000
+    python -m http.server 8000
+    goto :end
+)
+
+REM どちらも見つからない場合
+echo [エラー] Node.js または Python が必要です
+echo.
+echo 以下のいずれかをインストールしてください:
+echo.
+echo 1. Node.js (推奨): https://nodejs.org/
+echo 2. Python: https://www.python.org/
+echo.
+pause
+exit /b 1
+
+:end
+echo.
+echo [情報] サーバーが停止しました
+pause`;
+
+            const blob = new Blob([batContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'MarkdownEditor.bat';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showStatus('バッチファイルがダウンロードされました！ダブルクリックで起動してください。', 'success');
+        }
+    </script>
+</body>
+</html>
