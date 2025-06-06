@@ -1,0 +1,18 @@
+asset [1m[32mbundle.js[39m[22m 146 KiB [1m[33m[compared for emit][39m[22m [1m[32m[minimized][39m[22m (name: main)
+asset [1m[32mindex.html[39m[22m 2.78 KiB [1m[33m[compared for emit][39m[22m
+orphan modules 52.7 KiB [1m[33m[orphan][39m[22m 6 modules
+runtime modules 698 bytes 4 modules
+modules by path [1m./node_modules/markdown-it/[39m[22m 161 KiB 52 modules
+modules by path [1m./node_modules/style-loader/dist/runtime/*.js[39m[22m 5.84 KiB 6 modules
+modules by path [1m./node_modules/uc.micro/[39m[22m 2.58 KiB 6 modules
+modules by path [1m./node_modules/mdurl/*.js[39m[22m 15.4 KiB 5 modules
+modules by path [1m./src/[39m[22m 87.1 KiB 3 modules
+modules by path [1m./node_modules/css-loader/dist/runtime/*.js[39m[22m 2.31 KiB
+  [1m./node_modules/css-loader/dist/runtime/noSourceMaps.js[39m[22m 64 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  [1m./node_modules/css-loader/dist/runtime/api.js[39m[22m 2.25 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+modules by path [1m./node_modules/linkify-it/[39m[22m 23.1 KiB
+  [1m./node_modules/linkify-it/index.js[39m[22m 17.2 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  [1m./node_modules/linkify-it/lib/re.js[39m[22m 5.91 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1mpunycode (ignored)[39m[22m 15 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1m./node_modules/entities/lib/maps/entities.json[39m[22m 28.4 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.99.9 compiled [1m[32msuccessfully[39m[22m in 1285 ms

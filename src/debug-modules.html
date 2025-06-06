@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>モジュールデバッグページ</title>
+</head>
+<body>
+    <h1>モジュールデバッグページ</h1>
+    <div id="results"></div>
+    
+    <script type="module">
+        console.log('=== モジュールデバッグ開始 ===');
+        
+        try {
+            // GoogleDocsUploaderをインポート
+            console.log('GoogleDocsUploaderをインポート中...');
+            const GoogleDocsUploader = await import('./js/google-docs.js');
+            console.log('インポート結果:', GoogleDocsUploader);
+            console.log('default export:', GoogleDocsUploader.default);
+            console.log('default exportのタイプ:', typeof GoogleDocsUploader.default);
+            
+            if (GoogleDocsUploader.default) {
+                console.log('GoogleDocsUploaderクラスを発見');
+                
+                try {
+                    const instance = new GoogleDocsUploader.default();
+                    console.log('✅ インスタンス作成成功:', instance);
+                    
+                    // 結果をページに表示
+                    document.getElementById('results').innerHTML = `
+                        <h2>✅ 成功!</h2>
+                        <p>GoogleDocsUploaderクラスが正常にインポート・インスタンス化されました。</p>
+                        <pre>タイプ: ${typeof GoogleDocsUploader.default}</pre>
+                        <pre>インスタンス: ${instance.constructor.name}</pre>
+                    `;
+                } catch (error) {
+                    console.error('❌ インスタンス作成エラー:', error);
+                    document.getElementById('results').innerHTML = `
+                        <h2>❌ インスタンス作成エラー</h2>
+                        <pre>${error.message}</pre>
+                        <pre>${error.stack}</pre>
+                    `;
+                }
+            } else {
+                console.error('❌ default exportが存在しません');
+                document.getElementById('results').innerHTML = `
+                    <h2>❌ エクスポートエラー</h2>
+                    <p>GoogleDocsUploaderクラスのdefault exportが見つかりません。</p>
+                `;
+            }
+        } catch (error) {
+            console.error('❌ インポートエラー:', error);
+            document.getElementById('results').innerHTML = `
+                <h2>❌ インポートエラー</h2>
+                <pre>${error.message}</pre>
+                <pre>${error.stack}</pre>
+            `;
+        }
+    </script>
+</body>
+</html>

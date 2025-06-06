@@ -1,25 +1,18 @@
 {
   "name": "markdown-memo-app",
   "version": "1.0.0",
-  "description": "Modern web-based markdown memo application with live preview, tab management, and search functionality.",
-  "main": "src/js/app.js",
+  "description": "マークダウンメモアプリ",
+  "main": "src/index.html",
   "scripts": {
     "start": "webpack serve --mode development --port 4000",
     "build": "webpack --mode production",
-    "dev": "webpack serve --mode development --port 3002 --open",
-    "auth-server": "node server/auth-server.js",
-    "dev-with-auth": "concurrently \"npm run auth-server\" \"npm run dev\""
+    "dev": "webpack serve --mode development --port 3000 --open",
+    "server": "node server/auth-server.js",
+    "dev-with-auth": "concurrently \"npm run server\" \"npm run dev\""
   },
   "keywords": ["markdown", "editor", "memo", "google-docs"],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "markdown-it": "^13.0.1",
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "axios": "^1.6.0",
-    "dotenv": "^16.3.1"
-  },
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
@@ -31,5 +24,12 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "markdown-it": "^13.0.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
   }
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Docs統合テスト</title>
+</head>
+<body>
+    <h1>Google Docs統合テスト</h1>
+    <button id="test-button">テスト実行</button>
+    <div id="results"></div>
+
+    <script type="module">
+        console.log('テストページ読み込み開始');
+        
+        // Google Docsモジュールをインポートしてテスト
+        try {
+            console.log('Google Docsモジュールのインポートを試行...');
+            
+            // 動的インポートでテスト
+            const module = await import('./js/google-docs.js');
+            console.log('インポート成功:', module);
+            
+            const GoogleDocsUploader = module.default;
+            console.log('GoogleDocsUploaderクラス:', GoogleDocsUploader);
+            
+            if (GoogleDocsUploader) {
+                const uploader = new GoogleDocsUploader();
+                console.log('GoogleDocsUploaderインスタンス作成成功:', uploader);
+                
+                document.getElementById('results').innerHTML = `
+                    <p style="color: green;">✅ Google Docsモジュール読み込み成功</p>
+                    <p>認証状態: ${uploader.isAuthenticated}</p>
+                    <p>認証サーバーURL: ${uploader.authServerUrl}</p>
+                `;
+            }
+            
+        } catch (error) {
+            console.error('Google Docsモジュールのインポートエラー:', error);
+            document.getElementById('results').innerHTML = `
+                <p style="color: red;">❌ Google Docsモジュール読み込み失敗</p>
+                <pre>${error.toString()}</pre>
+            `;
+        }
+        
+        // 認証サーバーのテスト
+        document.getElementById('test-button').addEventListener('click', async () => {
+            console.log('認証サーバーテスト開始');
+            try {
+                const response = await fetch('http://localhost:3001/health');
+                const data = await response.json();
+                console.log('認証サーバー応答:', data);
+                
+                document.getElementById('results').innerHTML += `
+                    <p style="color: blue;">🔗 認証サーバー接続成功</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('認証サーバーテストエラー:', error);
+                document.getElementById('results').innerHTML += `
+                    <p style="color: red;">❌ 認証サーバー接続失敗</p>
+                    <pre>${error.toString()}</pre>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最小限テスト</title>
+</head>
+<body>
+    <h1>最小限のGoogle Docs機能テスト</h1>
+    
+    <textarea id="editor" style="width: 100%; height: 200px;">
+# テストドキュメント
+
+これはテスト用のマークダウンです。
+
+- 項目1
+- 項目2
+- 項目3
+
+**作成日**: 2025年6月6日
+    </textarea>
+    
+    <br><br>
+    <button id="google-docs-upload" style="padding: 10px 20px; background: #4285f4; color: white; border: none; border-radius: 4px;">
+        Google Docsに接続
+    </button>
+    
+    <div id="status" style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+        待機中...
+    </div>
+
+    <script type="module">
+        console.log('スクリプト開始');
+        
+        try {
+            // GoogleDocsUploaderをインポート
+            const { default: GoogleDocsUploader } = await import('./js/google-docs-simple.js');
+            console.log('GoogleDocsUploaderをインポート成功:', GoogleDocsUploader);
+            
+            // インスタンス作成
+            const uploader = new GoogleDocsUploader();
+            console.log('GoogleDocsUploaderインスタンス作成成功:', uploader);
+            
+            // グローバルに設定
+            window.googleDocsUploader = uploader;
+            
+            // ステータス更新
+            document.getElementById('status').innerHTML = '✅ GoogleDocsUploader初期化成功';
+            document.getElementById('status').style.background = '#d4edda';
+            
+        } catch (error) {
+            console.error('初期化エラー:', error);
+            document.getElementById('status').innerHTML = `❌ 初期化エラー: ${error.message}`;
+            document.getElementById('status').style.background = '#f8d7da';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Docs 機能テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #3367d6;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Google Docs 機能診断ツール</h1>
+        
+        <div class="test-section">
+            <h3>1. サーバー接続テスト</h3>
+            <button onclick="testServerConnection()">認証サーバー接続テスト</button>
+            <div id="server-status" class="status info">テスト待機中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. モジュール読み込みテスト</h3>
+            <button onclick="testModuleImport()">モジュール読み込みテスト</button>
+            <div id="module-status" class="status info">テスト待機中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. コンテンツ取得テスト</h3>
+            <textarea id="test-content" placeholder="ここにテスト用のマークダウンテキストを入力してください...">
+# テストドキュメント
+
+これはGoogle Docs統合機能のテスト用コンテンツです。
+
+## 機能
+- OAuth認証
+- ドキュメント作成
+- コンテンツアップロード
+
+**テスト日時**: ${new Date().toLocaleString('ja-JP')}
+            </textarea>
+            <button onclick="testContentRetrieval()">コンテンツ取得テスト</button>
+            <div id="content-status" class="status info">テスト待機中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Google Docs統合テスト</h3>
+            <button onclick="testGoogleDocsIntegration()">統合テスト実行</button>
+            <div id="integration-status" class="status info">テスト待機中...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. システム情報</h3>
+            <div id="system-info" class="status info">
+                <strong>ブラウザ:</strong> <span id="browser-info"></span><br>
+                <strong>現在のURL:</strong> <span id="current-url"></span><br>
+                <strong>ローカルストレージ:</strong> <span id="storage-info"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // システム情報を表示
+        document.getElementById('browser-info').textContent = navigator.userAgent;
+        document.getElementById('current-url').textContent = window.location.href;
+        
+        // ローカルストレージ情報
+        const authData = localStorage.getItem('google_auth_data');
+        document.getElementById('storage-info').textContent = authData ? '認証データあり' : '認証データなし';
+
+        // サーバー接続テスト
+        async function testServerConnection() {
+            const statusEl = document.getElementById('server-status');
+            statusEl.textContent = 'テスト中...';
+            statusEl.className = 'status info';
+
+            try {
+                const response = await fetch('http://localhost:3001/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    statusEl.textContent = `✅ 成功: ${data.status} - ${data.service}`;
+                    statusEl.className = 'status success';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ 失敗: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+
+        // モジュール読み込みテスト
+        async function testModuleImport() {
+            const statusEl = document.getElementById('module-status');
+            statusEl.textContent = 'テスト中...';
+            statusEl.className = 'status info';
+
+            try {
+                // GoogleDocsUploaderクラスの動的インポートをテスト
+                const module = await import('./js/google-docs-simple.js');
+                const GoogleDocsUploader = module.default;
+                
+                if (typeof GoogleDocsUploader === 'function') {
+                    const instance = new GoogleDocsUploader();
+                    statusEl.textContent = '✅ 成功: GoogleDocsUploaderクラスが正常に読み込まれました';
+                    statusEl.className = 'status success';
+                } else {
+                    throw new Error('GoogleDocsUploaderが関数ではありません');
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ 失敗: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+
+        // コンテンツ取得テスト
+        function testContentRetrieval() {
+            const statusEl = document.getElementById('content-status');
+            const content = document.getElementById('test-content').value;
+            
+            if (content.trim()) {
+                statusEl.textContent = `✅ 成功: ${content.length}文字のコンテンツを取得しました`;
+                statusEl.className = 'status success';
+            } else {
+                statusEl.textContent = '❌ 失敗: コンテンツが空です';
+                statusEl.className = 'status error';
+            }
+        }
+
+        // Google Docs統合テスト
+        async function testGoogleDocsIntegration() {
+            const statusEl = document.getElementById('integration-status');
+            statusEl.textContent = '統合テスト実行中...';
+            statusEl.className = 'status info';
+
+            try {
+                // サーバー接続確認
+                const healthResponse = await fetch('http://localhost:3001/health');
+                if (!healthResponse.ok) {
+                    throw new Error('認証サーバーに接続できません');
+                }
+
+                // OAuth認証URL取得テスト
+                const authResponse = await fetch('http://localhost:3001/auth/google');
+                if (!authResponse.ok) {
+                    throw new Error('認証URL取得に失敗しました');
+                }
+
+                const authData = await authResponse.json();
+                statusEl.textContent = '✅ 成功: OAuth認証URLが正常に生成されました';
+                statusEl.className = 'status success';
+                
+                // 認証URLを表示（オプション）
+                console.log('認証URL:', authData.authUrl);
+                
+            } catch (error) {
+                statusEl.textContent = `❌ 失敗: ${error.message}`;
+                statusEl.className = 'status error';
+            }
+        }
+
+        // ページ読み込み時にシステム情報を更新
+        window.addEventListener('load', () => {
+            console.log('診断ツールが読み込まれました');
+            
+            // 自動でサーバー接続テストを実行
+            setTimeout(testServerConnection, 1000);
+        });
+    </script>
+</body>
+</html>

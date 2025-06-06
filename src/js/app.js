@@ -9,6 +9,7 @@ import { MarkdownRenderer } from './markdown.js';
 import { SearchManager } from './search.js';
 import { TabManager } from './tabs.js';
 import { EditorManager } from './editor.js';
+import GoogleDocsUploader from './google-docs-simple.js';
 
 class MemoApp {
     constructor() {
@@ -153,12 +154,97 @@ class MemoApp {
         // アプリケーションの準備完了を示すスタイルクラスを追加
         document.body.classList.add('app-ready');
 
+        // Google Docs機能を初期化
+        this.initializeGoogleDocs();
+
         // 初回起動時のヘルプメッセージ
         this.showWelcomeMessageIfFirstTime();
 
         // パフォーマンス測定
         if (performance.mark) {
             performance.mark('app-ready');
+        }
+    }
+
+    // Google Docs機能を初期化
+    initializeGoogleDocs() {
+        console.log('Google Docs機能を初期化中...');
+        
+        // DOM読み込み完了を待つ
+        const initializeWhenReady = () => {
+            const googleDocsBtn = document.getElementById('google-docs-upload');
+            console.log('Google Docsボタン:', googleDocsBtn);
+            console.log('Google Docsボタンが存在:', !!googleDocsBtn);
+            console.log('GoogleDocsUploaderクラス:', GoogleDocsUploader);
+            console.log('GoogleDocsUploaderタイプ:', typeof GoogleDocsUploader);
+            
+            if (googleDocsBtn) {
+                console.log('Google Docsボタンが見つかりました');
+                
+                // 既存のインスタンスがない場合は新しく作成
+                if (!window.googleDocsUploader) {
+                    try {
+                        console.log('GoogleDocsUploaderクラス:', GoogleDocsUploader);
+                        console.log('GoogleDocsUploaderタイプ:', typeof GoogleDocsUploader);
+                        
+                        if (typeof GoogleDocsUploader === 'function') {
+                            window.googleDocsUploader = new GoogleDocsUploader();
+                            console.log('GoogleDocsUploaderインスタンスを作成しました');
+                        } else {
+                            throw new Error('GoogleDocsUploaderクラスが見つからないか、関数ではありません');
+                        }
+                    } catch (error) {
+                        console.error('GoogleDocsUploaderインスタンス作成エラー:', error);
+                        console.log('エラーの詳細:', error.stack);
+                        return;
+                    }
+                }
+                
+                // イベントリスナーを設定
+                if (window.googleDocsUploader.setupEventListeners) {
+                    try {
+                        window.googleDocsUploader.setupEventListeners();
+                        console.log('Google Docsイベントリスナーを設定しました');
+                    } catch (error) {
+                        console.error('Google Docsイベントリスナー設定エラー:', error);
+                    }
+                }
+                
+                // グローバルに公開
+                window.GoogleDocsUploader = GoogleDocsUploader;
+                
+                // バックアップ用：直接イベントリスナーを追加
+                googleDocsBtn.addEventListener('click', function(e) {
+                    console.log('直接追加されたクリックイベントが発火しました');
+                    
+                    // GoogleDocsUploaderのメソッドを直接呼び出し
+                    if (window.googleDocsUploader && window.googleDocsUploader.uploadToGoogleDocs) {
+                        const content = window.getMarkdownContent ? window.getMarkdownContent() : '';
+                        window.googleDocsUploader.uploadToGoogleDocs(content);
+                    }
+                });
+                
+            } else {
+                console.error('Google Docsボタンが見つかりません');
+                console.log('DOM内のすべてのボタン:');
+                const allButtons = document.querySelectorAll('button');
+                allButtons.forEach((btn, i) => {
+                    console.log(`  ${i}: id="${btn.id}" text="${btn.textContent.trim()}"`);
+                });
+                
+                // 5秒後に再試行
+                setTimeout(() => {
+                    console.log('Google Docsボタンの初期化を再試行...');
+                    initializeWhenReady();
+                }, 5000);
+            }
+        };
+        
+        // 即座に実行または DOM読み込み完了を待つ
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWhenReady);
+        } else {
+            initializeWhenReady();
         }
     }
 
@@ -406,6 +492,26 @@ Happy Writing! 📝`;
 
 // アプリケーションのインスタンスを作成
 const memoApp = new MemoApp();
+
+// Google Docs統合用のグローバル関数
+window.getMarkdownContent = function() {
+    if (memoApp && memoApp.editorManager && memoApp.editorManager.editor) {
+        return memoApp.editorManager.editor.value || '';
+    }
+    
+    // フォールバック: 直接DOM要素を取得
+    const editor = document.getElementById('editor');
+    return editor ? editor.value || '' : '';
+};
+
+// 現在のタブタイトルを取得
+window.getCurrentTabTitle = function() {
+    if (memoApp && memoApp.tabManager) {
+        const activeTab = memoApp.tabManager.getActiveTab();
+        return activeTab ? activeTab.title : '新しいドキュメント';
+    }
+    return '新しいドキュメント';
+};
 
 // DOMが読み込まれたらアプリケーションを初期化
 document.addEventListener('DOMContentLoaded', () => {
