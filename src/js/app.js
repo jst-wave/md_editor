@@ -345,6 +345,23 @@ Happy Writing! 📝`;
         console.groupEnd();
     }
 
+    // 現在のエディタコンテンツを取得（Google Docs連携用）
+    getCurrentContent() {
+        if (this.editorManager && this.editorManager.editor) {
+            return this.editorManager.editor.value;
+        }
+        return '';
+    }
+
+    // 現在のタブのタイトルを取得（Google Docs連携用）
+    getCurrentTabTitle() {
+        if (this.tabManager) {
+            const activeTab = this.tabManager.getActiveTab();
+            return activeTab ? activeTab.title : 'Untitled';
+        }
+        return 'Untitled';
+    }
+
     // プレビュー機能専用デバッグ
     debugPreview() {
         console.group('プレビュー機能デバッグ');
@@ -397,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // デバッグ用・他のモジュールからのアクセス用：グローバルオブジェクトとして公開
 window.memoApp = memoApp;
+window.editorApp = memoApp; // Google Docs連携用のエイリアス
 window.storageManager = memoApp.storageManager;
 window.markdownRenderer = memoApp.markdownRenderer;
 window.searchManager = memoApp.searchManager;
