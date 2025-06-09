@@ -14,7 +14,7 @@
             <div class="controls">
                 <button id="add-tab">+ 新しいタブ</button>
                 <button id="save-markdown">💾 ダウンロード</button>
-                <button id="google-docs-upload">📄 Google Docs</button>
+                <button id="google-docs-btn">📄 Google Docs</button>
                 <button id="toggle-preview">プレビュー表示</button>
                 <button id="search-toggle">検索・置換</button>
             </div>
@@ -38,39 +38,6 @@
                 <button id="replace-one">置換</button>
                 <button id="replace-all">すべて置換</button>
                 <button id="close-search">✕</button>
-            </div>
-        </div>
-
-        <div id="google-upload-modal" class="modal hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Google ドキュメントにアップロード</h3>
-                    <button id="close-modal" class="close-btn">✕</button>
-                </div>
-                <div class="modal-body">
-                    <div id="auth-section">
-                        <p>Google ドキュメントにアップロードするには、Googleアカウントでの認証が必要です。</p>
-                        <button id="google-auth-btn" class="primary-btn">Google でサインイン</button>
-                    </div>
-                    <div id="upload-section" class="hidden">
-                        <div class="form-group">
-                            <label for="doc-title">ドキュメントタイトル:</label>
-                            <input type="text" id="doc-title" placeholder="ドキュメントのタイトルを入力">
-                        </div>
-                        <div class="form-group">
-                            <label>アップロード形式:</label>
-                            <div class="radio-group">
-                                <label><input type="radio" name="upload-format" value="markdown" checked> Markdown</label>
-                                <label><input type="radio" name="upload-format" value="html"> HTML (プレビュー)</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <button id="upload-btn" class="primary-btn">アップロード</button>
-                            <button id="cancel-upload" class="secondary-btn">キャンセル</button>
-                        </div>
-                        <div id="upload-status" class="status-message"></div>
-                    </div>
-                </div>
             </div>
         </div>
 

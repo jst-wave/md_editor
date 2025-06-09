@@ -9,7 +9,7 @@ import { MarkdownRenderer } from './markdown.js';
 import { SearchManager } from './search.js';
 import { TabManager } from './tabs.js';
 import { EditorManager } from './editor.js';
-import GoogleDocsUploader from './google-docs-simple.js';
+import GoogleDocsUploader from './google-docs-complete.js';
 
 class MemoApp {
     constructor() {
@@ -131,8 +131,7 @@ class MemoApp {
                 }
                 return '新しいドキュメント';
             };
-            
-            console.log('Google Docs機能の初期化が完了しました');
+              console.log('Google Docs機能の初期化が完了しました');
             
         } catch (error) {
             console.error('Google Docs機能の初期化エラー:', error);
@@ -165,3 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // デバッグ用：グローバルオブジェクトとして公開
 window.memoApp = memoApp;
+
+// Google Docs連携用のグローバル関数
+window.getMarkdownContent = () => {
+    return memoApp.getCurrentContent();
+};
+
+window.getCurrentTabTitle = () => {
+    return memoApp.getCurrentTabTitle();
+};

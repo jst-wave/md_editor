@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Docs機能テスト</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .test-button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background-color: #3367d6;
+        }
+        .test-button.authenticated {
+            background-color: #0f9d58;
+        }
+        #test-editor {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Docs連携機能テスト</h1>
+    
+    <div class="test-section">
+        <h2>1. 認証状態確認</h2>
+        <button id="check-auth-btn" class="test-button">認証状態をチェック</button>
+        <button id="clear-auth-btn" class="test-button">認証状態をクリア</button>
+        <div id="auth-status" class="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. サンプルコンテンツ</h2>
+        <textarea id="test-editor" placeholder="テスト用のMarkdownコンテンツを入力してください...">
+# サンプルドキュメント
+
+これは**Google Docs連携機能**のテスト用ドキュメントです。
+
+## 機能一覧
+- Markdown形式でのアップロード
+- HTML形式での変換アップロード
+- 認証状態の永続化
+- エラーハンドリング
+
+### テスト項目
+1. 認証フロー
+2. アップロード処理
+3. エラー処理
+
+> このテストが成功すれば、Google Docs連携機能は正常に動作しています。
+
+```javascript
+console.log('Google Docs連携完了！');
+```
+
+**注意**: このテストでは実際にGoogle Docsにドキュメントが作成されます。
+        </textarea>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Google Docs アップロード</h2>
+        <button id="google-docs-btn" class="test-button">Google Docs (ログイン)</button>
+        <button id="test-upload-btn" class="test-button">テストアップロード実行</button>
+        <div id="upload-status" class="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. ログ出力</h2>
+        <button id="clear-log-btn" class="test-button">ログクリア</button>
+        <div id="log-output" class="log"></div>
+    </div>
+
+    <script type="module">
+        import GoogleDocsUploader from './js/google-docs-complete.js';
+
+        // ログ出力関数
+        function log(message) {
+            console.log(message);
+            const logOutput = document.getElementById('log-output');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.textContent += `[${timestamp}] ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        // ステータス表示関数
+        function showStatus(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // グローバル関数を設定
+        window.getMarkdownContent = () => {
+            return document.getElementById('test-editor').value || '';
+        };
+
+        window.getCurrentTabTitle = () => {
+            return 'Google Docs連携テスト';
+        };
+
+        // Google Docs Uploaderを初期化
+        let uploader;
+        try {
+            log('Google Docs Uploader を初期化中...');
+            uploader = new GoogleDocsUploader();
+            log('Google Docs Uploader 初期化完了');
+        } catch (error) {
+            log(`初期化エラー: ${error.message}`);
+        }
+
+        // イベントリスナーを設定
+        document.getElementById('check-auth-btn').addEventListener('click', () => {
+            if (uploader) {
+                const isAuth = uploader.isAuthenticated;
+                const userInfo = uploader.userInfo;
+                const message = isAuth ? 
+                    `認証済み - ユーザー: ${userInfo?.name || '不明'} (${userInfo?.email || '不明'})` : 
+                    '未認証';
+                showStatus('auth-status', message, isAuth ? 'success' : 'error');
+                log(`認証状態: ${message}`);
+            }
+        });
+
+        document.getElementById('clear-auth-btn').addEventListener('click', () => {
+            if (uploader) {
+                uploader.clearAuthState();
+                showStatus('auth-status', '認証状態をクリアしました', 'success');
+                log('認証状態をクリアしました');
+            }
+        });
+
+        document.getElementById('clear-log-btn').addEventListener('click', () => {
+            document.getElementById('log-output').textContent = '';
+        });
+
+        document.getElementById('test-upload-btn').addEventListener('click', () => {
+            const content = document.getElementById('test-editor').value;
+            if (!content.trim()) {
+                showStatus('upload-status', 'アップロードするコンテンツがありません', 'error');
+                return;
+            }
+            
+            log('テストアップロードを開始...');
+            if (uploader) {
+                uploader.handleUpload();
+            } else {
+                showStatus('upload-status', 'Google Docs Uploader が初期化されていません', 'error');
+            }
+        });
+
+        // 初期ログ
+        log('テストページが読み込まれました');
+        log('Google Docs連携機能のテストを開始してください');
+    </script>
+</body>
+</html>

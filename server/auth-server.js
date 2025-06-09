@@ -1,10 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const session = require('express-session');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// セッション設定
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'google-docs-uploader-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24時間
+}));
 
 // CORS設定
 app.use(cors({
@@ -46,7 +55,10 @@ app.get('/auth/google', (req, res) => {
         `prompt=consent&` +
         `state=${state}`;
     
-    res.redirect(authUrl);
+    // セッションにstate情報を保存
+    req.session.authState = state;
+    
+    res.json({ authUrl });
 });
 
 // Google OAuth コールバック処理
@@ -79,43 +91,59 @@ app.get('/auth/google/callback', async (req, res) => {
         });
         
         const userProfile = userResponse.data;
-        
-        // 認証データをまとめる
+          // 認証データをまとめる
         const authData = {
-            access_token,
-            refresh_token,
-            expires_at: Date.now() + (expires_in * 1000),
-            user_profile: userProfile
+            accessToken: access_token,
+            refreshToken: refresh_token,
+            expiresAt: Date.now() + (expires_in * 1000),
+            userInfo: {
+                id: userProfile.id,
+                email: userProfile.email,
+                name: userProfile.name,
+                picture: userProfile.picture
+            }
         };
         
-        // 認証成功をクライアントに伝える
+        // セッションに認証データを保存
+        req.session.authData = authData;
+          // 認証成功をクライアントに伝える
         const successHtml = `
         <!DOCTYPE html>
         <html>
         <head>
             <title>認証成功</title>
             <meta charset="utf-8">
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                .success { color: #0f9d58; }
+                .countdown { color: #666; margin-top: 20px; }
+            </style>
         </head>
         <body>
-            <h2>Google認証が完了しました</h2>
-            <p>このウィンドウを閉じてメモアプリに戻ってください。</p>
+            <h2 class="success">✅ Google認証が完了しました</h2>
+            <p>こんにちは、${userProfile.name}さん！</p>
+            <p>このウィンドウは自動的に閉じられます。</p>
+            <div class="countdown" id="countdown">3秒後にウィンドウを閉じます...</div>
             <script>
-                // 認証データを親ウィンドウ（メモアプリ）に送信
-                const authData = ${JSON.stringify(authData)};
-                localStorage.setItem('google_auth_data', JSON.stringify(authData));
+                let count = 3;
+                const countdown = document.getElementById('countdown');
+                
+                const timer = setInterval(() => {
+                    count--;
+                    countdown.textContent = count > 0 ? count + '秒後にウィンドウを閉じます...' : 'ウィンドウを閉じています...';
+                    
+                    if (count <= 0) {
+                        clearInterval(timer);
+                        window.close();
+                    }
+                }, 1000);
                 
                 // 親ウィンドウに認証完了を通知
                 if (window.opener) {
                     window.opener.postMessage({
-                        type: 'google_auth_success',
-                        data: authData
+                        type: 'google_auth_success'
                     }, '*');
                 }
-                
-                // 3秒後に自動でウィンドウを閉じる
-                setTimeout(() => {
-                    window.close();
-                }, 3000);
             </script>
         </body>
         </html>
@@ -126,6 +154,29 @@ app.get('/auth/google/callback', async (req, res) => {
     } catch (error) {
         console.error('OAuth error:', error.response?.data || error.message);
         res.redirect(`http://localhost:3000?error=${encodeURIComponent('auth_failed')}`);
+    }
+});
+
+// 認証状態確認エンドポイント
+app.get('/auth/status', (req, res) => {
+    if (req.session.authData) {
+        const authData = req.session.authData;
+        
+        // トークンの有効期限をチェック
+        if (authData.expiresAt && authData.expiresAt > Date.now()) {
+            res.json({
+                authenticated: true,
+                accessToken: authData.accessToken,
+                userInfo: authData.userInfo,
+                expiresAt: authData.expiresAt
+            });
+        } else {
+            // トークンが期限切れ
+            req.session.authData = null;
+            res.json({ authenticated: false, reason: 'token_expired' });
+        }
+    } else {
+        res.json({ authenticated: false, reason: 'not_authenticated' });
     }
 });
 
